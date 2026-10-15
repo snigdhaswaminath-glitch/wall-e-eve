@@ -1,0 +1,10 @@
+seed: 11
+map: {width: 30, height: 30, obstacles: 0.15}
+start: [0, 0]
+initial_signal: {bearing_deg: 45, strength: 0.2, timestamp: 0}
+signal_scale: 8
+signal_noise: 0.03
+budget: {battery: 30, time: 150}
+costs: {move: 1, scan: 3, recharge: 0}
+recharge_stations: [[0, 0], [15, 15],[25,25]]
+clues: {count: 5, seed: 9}
