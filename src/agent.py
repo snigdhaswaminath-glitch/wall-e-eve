@@ -45,7 +45,7 @@ class Agent:
         self.clue_bonus = clue_bonus
 
         self.X, self.Y = np.meshgrid(np.arange(self.w), np.arange(self.h), indexing="ij")
-        self.visited = set()
+        self.visits = {}  # cell -> how many times WALL-E has stood there
         self.scanned = np.zeros((self.w, self.h), dtype=bool)
         self.blocked_moves = set()  # (cell, direction) pairs that hit a wall/obstacle
         self.last_action = None
@@ -125,7 +125,7 @@ class Agent:
         pos = tuple(obs["pos"])
         battery, time_left, t = obs["battery"], obs["time_left"], obs["t"]
         self._learn_from_last_action(pos, obs)
-        self.visited.add(pos)
+        self.visits[pos] = self.visits.get(pos, 0) + 1
 
         conf, ent = belief.confidence(), belief.entropy()
         note = self._update_phase(t, conf)
@@ -150,8 +150,7 @@ class Agent:
                 continue
             ed_new = float((belief.p * self._dist((nx, ny))).sum())
             gain = self._reading_info(belief, (nx, ny)) + approach_w * (ed_now - ed_new)
-            if (nx, ny) in self.visited:
-                gain -= 0.05  # tiny nudge away from retracing steps
+            gain -= 0.15 * self.visits.get((nx, ny), 0)  # discourage pacing back and forth
             cands.append((f"move {d}", {"type": "move", "dir": d}, (nx, ny), self.move_cost, gain))
 
         dist_here = self._dist(pos)
@@ -164,10 +163,11 @@ class Agent:
             + success_w * p_find                                   # reward for finding EVE
             + self.clue_bonus * unscanned * min(1.0, 4 * mass_near)  # chance of new clues
         )
-        cands.append(
-            (f"scan r{self.scan_radius}", {"type": "scan", "radius": self.scan_radius},
-             pos, self.scan_cost, scan_gain)
-        )
+        if scan_gain > 0.02:  # a scan that cannot tell us anything new is never worth its cost
+            cands.append(
+                (f"scan r{self.scan_radius}", {"type": "scan", "radius": self.scan_radius},
+                 pos, self.scan_cost, scan_gain)
+            )
 
         # 3. Safety filter: after acting we must still be able to reach a station.
         safe = [

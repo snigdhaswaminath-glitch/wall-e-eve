@@ -1,0 +1,139 @@
+ASCII MISSION VISUALIZATION
+===========================
+
+PATH MAP (north is up)
+
+   0                   1                  
+   0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9
+19 . . . . . . # . . . . . . . . . . . . .
+18 . . . . . . . . . . . # # . . . # . . .
+17 # . . . # . . . . . . . . . . . . . . .
+16 . . . . . . . . . . . . . . . . # . . .
+15 . . . . . . # . # . . . . . . . . . . .
+14 . . . # . . . . . . . . . . . . . . . #
+13 . . . . . . c . . . . . . . # . . . . .
+12 . . . . . . . . . . . . . # . . . . . .
+11 . . # . . . . . . . . . . . # . . . . .
+10 . . . . . . . . . . R . . # . . . . . .
+ 9 . . . . . . . # . . . . . # . . . # . .
+ 8 . . . # . # c c . . . . . . . . . . . .
+ 7 . # . . . . . . . # c . . . . . . . . .
+ 6 . . . . E . . . . . . # . . # . . . . .
+ 5 . . . . # . . . . . . . . . . . . . . .
+ 4 # . . . # . # . . . # . . . . . . . . .
+ 3 . . . . . . . . # . . . . . . . . . # .
+ 2 . . . . W . # . . . c . . . . . . . . .
+ 1 . . . . * . . . . . . . . . . . . . . .
+ 0 S * * * 1 . . . . . . . . . # . . . . .
+   0                   1                  
+   0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9
+
+Legend: S start | R recharge station | * cells WALL-E visited | W WALL-E at the end
+        C clue found | c clue never found | # obstacle | E EVE (true position)
+        1-9 point where the strategy changed (listed below)
+(Obstacles, E and unfound clues were hidden from the agent; shown here for evaluation.)
+
+Strategy changes:
+  1: step 4, triangulate -> close_in at (4, 0), confidence 0.789
+
+===========================
+
+ACTION TIMELINE
+
+Actions: ^ v > < move N/S/E/W | ! blocked move | o scan (nothing) | X scan found EVE
+         R recharge | A abort
+Phases:  e explore | t triangulate | c close_in
+
+steps    1-7    >>>>^^X
+                ttttccc
+
+===========================
+
+BELIEF OVER TIME
+Shading: faint '.' to strong '@' (scaled to each panel's peak, blank = ruled out)
+W = WALL-E at that moment | E = true EVE position (evaluation only)
+
+Start (belief from the initial signal)
+  entropy 5.02 bits | best guess (5, 5) | confidence 0.44
+
+   0                   1                  
+   0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9
+19                                        
+18                                        
+17                                        
+16                                        
+15                                        
+14                                        
+13                                        
+12                                        
+11                                        
+10                                        
+ 9 . : : .                                
+ 8 = = = = - :                            
+ 7 = * # % # = :                          
+ 6 : - + # E % + :                        
+ 5     : - # @ % = :                      
+ 4         - # @ # -                      
+ 3           - # % = .                    
+ 2           : + # = :                    
+ 1             - * = :                    
+ 0 W           : = = .                    
+   0                   1                  
+   0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9
+
+Step 4: just before strategy change 1 (triangulate -> close_in)
+  entropy 2.86 bits | best guess (4, 6) | confidence 0.79
+
+   0                   1                  
+   0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9
+19                                        
+18                                        
+17                                        
+16                                        
+15                                        
+14                                        
+13                                        
+12                                        
+11                                        
+10                                        
+ 9                                        
+ 8                                        
+ 7     : : .                              
+ 6   : = # E # :                          
+ 5         . = * :                        
+ 4             . -                        
+ 3                 :                      
+ 2                                        
+ 1                                        
+ 0         W                              
+   0                   1                  
+   0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9
+
+Final (step 7)
+  entropy 0.98 bits | best guess (4, 6) | confidence 0.79
+
+   0                   1                  
+   0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9
+19                                        
+18                                        
+17                                        
+16                                        
+15                                        
+14                                        
+13                                        
+12                                        
+11                                        
+10                                        
+ 9                                        
+ 8                                        
+ 7                                        
+ 6         E                              
+ 5           : +                          
+ 4               :                        
+ 3                                        
+ 2         W                              
+ 1                                        
+ 0                                        
+   0                   1                  
+   0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9
+

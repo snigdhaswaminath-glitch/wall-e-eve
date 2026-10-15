@@ -20,7 +20,8 @@ wall-e-eve/
 │   ├── belief.py             # Bayesian belief over EVE's location
 │   ├── agent.py              # planner / decision logic
 │   ├── run.py                # runs a mission, writes trace + report
-│   └── report.py             # final mission report
+│   ├── report.py             # final mission report
+│   └── viz.py                # ASCII visualization
 └── outputs/                  # sample traces and reports (see below)
 ```
 
@@ -32,11 +33,14 @@ python src/run.py configs/sample_mission.yaml
 python src/run.py configs/hard_mission.yaml --out outputs/hard
 ```
 
-`run.py` prints one line per step and writes two files into the output folder
+`run.py` prints one line per step and writes three files into the output folder
 (`outputs` by default, or whatever you pass to `--out`):
 
 - `trace.jsonl`: one JSON line per step
 - `report.md`: the final mission report
+- `viz.txt`: ASCII map of the path, an action timeline and belief heatmaps
+
+Add `--show` to also print the visualization in the terminal.
 
 Each module also has a small demo: `python src/env.py <config>`,
 `python src/belief.py <config>`, `python src/agent.py <config>`.
@@ -139,7 +143,8 @@ Each step the agent:
 2. **Picks a strategy phase** from the belief's confidence: `explore` (below 0.3), `triangulate` (0.3 to 0.7), or `close_in` (above 0.7). The phase sets how much weight goes to finding EVE with a scan versus moving closer. Phase switches are logged as strategy changes.
 3. **Scores candidate actions** (move in four directions, or scan at the widest radius) as `(information gain + progress) / battery cost`:
    - *Move:* expected bits learned from the signal reading at the new cell, plus a small bonus for reducing the expected distance to EVE.
-   - *Scan:* chance of finding EVE in the radius, plus the information from a hit or miss, plus a small bonus for covering unscanned ground (possible clues).
+   - *Scan:* chance of finding EVE in the radius, plus the information from a hit or miss, plus a small bonus for covering unscanned ground (possible clues). A scan that could not tell the agent anything new is never chosen.
+   - Moves into cells WALL-E has already visited are penalized (more for each extra visit), which stops it pacing back and forth.
 4. **Filters for safety:** any action that would leave too little battery to reach the nearest recharge station (a margin of 5 on top of the walking distance) is discarded.
 5. **Handles low battery:** if nothing safe remains, it walks to the nearest station and recharges; if it cannot reach one, or it is already on a station with nothing safe left to do, it aborts. It also tops up the battery whenever it is on a station below 70% charge.
 6. **Explains itself:** every decision returns a short reasoning string, such as `[triangulate] conf 0.44, entropy 5.0 bits, battery 100; best: move N (score 1.39), next: move E (1.39)`.
@@ -155,6 +160,13 @@ belief {best_guess, top_cells, entropy_bits, confidence}, phase, reasoning, cand
 
 The belief in a line is the belief *after* absorbing that step's observation.
 
+**`viz.txt`:** an ASCII visualization (post-mission, so it also draws the hidden
+obstacles, EVE and unfound clues for evaluation):
+
+- a path map: start, recharge stations, visited cells, found and unfound clues, EVE, the final position, and numbered points where the strategy changed
+- an action timeline with the strategy phase under every step
+- belief heatmaps at the start, just before each strategy change, and at the end
+
 **`report.md`:** outcome and resource use; evidence found (strongest signal, clues
 with the step they were found, empty scans); inferred location, status and
 confidence; strategy changes; a recommended next step; and an evaluation section
@@ -165,11 +177,14 @@ comparing the estimate with the hidden ground truth (the agent never sees it).
 | Config | Output folder | Notes |
 |---|---|---|
 | `configs/sample_mission.yaml` | `outputs/` | Small map; EVE found in a handful of steps |
-| `configs/hard_mission.yaml` | `outputs/hard/` | 30x30 map, 15% obstacles, battery 50, noisy signal; needs a recharge and finds two clues |
+| `configs/hard_mission.yaml` | `outputs/hard/` | 30x30 map, 15% obstacles, battery 50, noisy signal; needs a recharge and finds a clue |
+
+Each folder holds `trace.jsonl`, `report.md` and `viz.txt`.
 
 ## Limitations
 
 - EVE is stationary, and there is a single agent.
 - Obstacles are unknown to the agent, so its battery-safety estimate uses walking distance without detours; the margin absorbs most of the error, but a mission can still end in `aborted` when detours eat the battery.
 - The scan cost is flat in this environment, so the agent always scans at the widest radius.
-- Not implemented: visualization, decoy signals, multi-agent coordination, an LLM planner comparison, and a multi-seed generalization benchmark.
+- Navigation is greedy: the agent only reasons one step ahead and learns obstacles by bumping into them, so it can waste moves in dead ends. A path planner over the known map would fix this.
+- Not implemented: decoy signals, multi-agent coordination, an LLM planner comparison, and a multi-seed generalization benchmark.

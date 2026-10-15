@@ -1,0 +1,454 @@
+ASCII MISSION VISUALIZATION
+===========================
+
+PATH MAP (north is up)
+
+   0                   1                   2                  
+   0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9
+29 # . . . . . . # . . # . . . . . . . . . . . . . . . . . . #
+28 . # # . . . . . . . . . . . . # . . . . . # . . # . . . . .
+27 . . # # . . . . . . . # . . . . . . # . . . # . . . . . . .
+26 . . . . . . # . . . . . . . . . . . . . . . # . . . . . . #
+25 . . . . . . . # . . . # . . . . . # . . # . . . . R . # . .
+24 . . . . . . . . . . . . . # . . . # . . . . . . . . . . . .
+23 . # . . . . . . # . . . . . . . . . . . . . . . . . . # . .
+22 . # . # # . . . . . . . . . . . # . . # . . . . . . . . . .
+21 . . . . . # # . . . # . . . . . . . . . # . . . # . . . . .
+20 . . . . # . . . . . # . . . . . . . . . # . . . # # # . . .
+19 . . . # . . . . . . . . . . . # . . . # . . . . # . . . . .
+18 . . . . c # # . # # . # # . . . . . . . . . . . . . . # . .
+17 . # . . # . . . . # # # . . . # . . . . . . . . . . . . . .
+16 . . . . . . . . . . # . # c . . . . # . . . . . . # # . . .
+15 . . . # . . . . . . . . . . . R . . . . . # . . . . . . . #
+14 # . . . . . . . . . . . . . . . . # . # . . . . . . # . . #
+13 . . # . . . . . . . . . . . . . . . . # # . . . . . . . . .
+12 . . # . # . . # . . . . . . . . . . . . . . . . # # # . . .
+11 . . . . # . # E . . . . c . . . . . . . . . . . . . . # # .
+10 . # . # . . c . . . # . . . . . . . . . . # . . . . . . . .
+ 9 . . # . . . . # . . . . # . . . # . . . . . . . . . . # . #
+ 8 . * c # . . . . . . . . . . . . # . # . . . # . . . . . # .
+ 7 # W * * # . . . . . . . # # . . # # . . . . . . . . . . . .
+ 6 # * # * . . . # # . . . . . . . . . . . # . . . . . # . . .
+ 5 . # . * . . * # # . . . # . . . . . . . . . . . # . . . . .
+ 4 # . . * . * * . . . . . . . . # . . . . . . . # . # . . . .
+ 3 # . # * * * 4 . . . # # . . . . . . . # . . . . . # . # . .
+ 2 1 # * * * * * . . . . . . . . . . . . # # . . . # # . . # .
+ 1 8 * 7 * # . . # . . . . . . . . . . . . # # . . . . . . . .
+ 0 6 * # * # # . . # . # . . . . . . . # . . . # . . # . . . #
+   0                   1                   2                  
+   0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9
+
+Legend: S start | R recharge station | * cells WALL-E visited | W WALL-E at the end
+        C clue found | c clue never found | # obstacle | E EVE (true position)
+        1-9 point where the strategy changed (listed below)
+(Obstacles, E and unfound clues were hidden from the agent; shown here for evaluation.)
+
+Strategy changes:
+  1: step 2, explore -> triangulate at (0, 2), confidence 0.302
+  2: step 5, triangulate -> explore at (0, 1), confidence 0.268
+  3: step 7, explore -> triangulate at (2, 1), confidence 0.315
+  4: step 14, triangulate -> close_in at (6, 3), confidence 0.786
+  5: step 26, close_in -> triangulate at (0, 1), confidence 0.651
+  6: step 27, triangulate -> close_in at (0, 0), confidence 0.726
+  7: step 32, close_in -> triangulate at (2, 1), confidence 0.65
+  8: step 54, triangulate -> close_in at (0, 1), confidence 0.763
+
+===========================
+
+ACTION TIMELINE
+
+Actions: ^ v > < move N/S/E/W | ! blocked move | o scan (nothing) | X scan found EVE
+         R recharge | A abort
+Phases:  e explore | t triangulate | c close_in
+
+steps    1-50   ^^!!v>>>!^>>>^^<v<<!v<!v<<vR>^!>^!>>^>^>^v<v<<vvv!
+                eettteetttttttcccccccccccctccccctttttttttttttttttt
+steps   51-80   ^<<<vR>!^>^>^^^^^!!<^<vv!!^v^A
+                ttttcccccccccccccccccccccccccc
+
+===========================
+
+BELIEF OVER TIME
+Shading: faint '.' to strong '@' (scaled to each panel's peak, blank = ruled out)
+W = WALL-E at that moment | E = true EVE position (evaluation only)
+
+Start (belief from the initial signal)
+  entropy 6.32 bits | best guess (8, 9) | confidence 0.26
+
+   0                   1                   2                  
+   0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9
+29                                                            
+28                                                            
+27                                                            
+26                                                            
+25                                                            
+24                                                            
+23                                                            
+22                                                            
+21                                                            
+20                                                            
+19                                                            
+18                                                            
+17                                                            
+16                                                            
+15 . . . . . .                                                
+14 : - - - : : : .                                            
+13 = = = + = = - - : .                                        
+12 + + * * # * * = - : :                                      
+11 = = + * # % % E * = - :                                    
+10 : : - = * # @ @ % * = - :                                  
+ 9       : - = # @ @ % * = : .                                
+ 8           : - * @ @ % * - :                                
+ 7             . - * @ @ # = - .                              
+ 6               . - # @ % * - :                              
+ 5                 : = # % * = : .                            
+ 4                   - * # # = : .                            
+ 3                   : = * * + - .                            
+ 2                     - + * = - .                            
+ 1                     : = + = - .                            
+ 0 W                   : = + = : .                            
+   0                   1                   2                  
+   0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9
+
+Step 2: just before strategy change 1 (explore -> triangulate)
+  entropy 5.35 bits | best guess (9, 8) | confidence 0.30
+
+   0                   1                   2                  
+   0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9
+29                                                            
+28                                                            
+27                                                            
+26                                                            
+25                                                            
+24                                                            
+23                                                            
+22                                                            
+21                                                            
+20                                                            
+19                                                            
+18                                                            
+17                                                            
+16                                                            
+15                                                            
+14 . . .                                                      
+13 - = = - - :                                                
+12 = = + * # + = :                                            
+11   . : - + % % E -                                          
+10         . - # @ # -                                        
+ 9             : * @ # -                                      
+ 8               : * @ * :                                    
+ 7                 : % % =                                    
+ 6                   = @ * :                                  
+ 5                   : * # -                                  
+ 4                     = # -                                  
+ 3                     : * = .                                
+ 2 W                   : + = .                                
+ 1                     . = - .                                
+ 0                     . - -                                  
+   0                   1                   2                  
+   0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9
+
+Step 5: just before strategy change 2 (triangulate -> explore)
+  entropy 5.26 bits | best guess (10, 7) | confidence 0.27
+
+   0                   1                   2                  
+   0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9
+29                                                            
+28                                                            
+27                                                            
+26                                                            
+25                                                            
+24                                                            
+23                                                            
+22                                                            
+21                                                            
+20                                                            
+19                                                            
+18                                                            
+17                                                            
+16                                                            
+15                                                            
+14 : : : .                                                    
+13 = + + + = : .                                              
+12 - - = * # # + -                                            
+11       . - * @ E = .                                        
+10           . = @ @ = .                                      
+ 9               - @ @ =                                      
+ 8                 - @ % -                                    
+ 7                   + @ + .                                  
+ 6                   . # % :                                  
+ 5                     = % =                                  
+ 4                     : # + .                                
+ 3                       + + :                                
+ 2                       = + :                                
+ 1 W                     - = :                                
+ 0                       - - .                                
+   0                   1                   2                  
+   0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9
+
+Step 7: just before strategy change 3 (explore -> triangulate)
+  entropy 4.92 bits | best guess (7, 11) | confidence 0.31
+
+   0                   1                   2                  
+   0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9
+29                                                            
+28                                                            
+27                                                            
+26                                                            
+25                                                            
+24                                                            
+23                                                            
+22                                                            
+21                                                            
+20                                                            
+19                                                            
+18                                                            
+17                                                            
+16                                                            
+15                                                            
+14 : : : .                                                    
+13 + * # # + - :                                              
+12 : - - + % @ % = .                                          
+11         . - # E * :                                        
+10               = @ # :                                      
+ 9                 - % * :                                    
+ 8                   - # =                                    
+ 7                     = * :                                  
+ 6                       + =                                  
+ 5                       - + .                                
+ 4                       . = :                                
+ 3                         - :                                
+ 2                         - :                                
+ 1     W                   : :                                
+ 0                         : :                                
+   0                   1                   2                  
+   0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9
+
+Step 14: just before strategy change 4 (triangulate -> close_in)
+  entropy 2.50 bits | best guess (7, 11) | confidence 0.79
+
+   0                   1                   2                  
+   0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9
+29                                                            
+28                                                            
+27                                                            
+26                                                            
+25                                                            
+24                                                            
+23                                                            
+22                                                            
+21                                                            
+20                                                            
+19                                                            
+18                                                            
+17                                                            
+16                                                            
+15                                                            
+14                                                            
+13                                                            
+12         . : :                                              
+11           : # E =                                          
+10                 = * .                                      
+ 9                     - .                                    
+ 8                       .                                    
+ 7                                                            
+ 6                                                            
+ 5                                                            
+ 4                                                            
+ 3             W                                              
+ 2                                                            
+ 1                                                            
+ 0                                                            
+   0                   1                   2                  
+   0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9
+
+Step 26: just before strategy change 5 (close_in -> triangulate)
+  entropy 1.92 bits | best guess (7, 11) | confidence 0.65
+
+   0                   1                   2                  
+   0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9
+29                                                            
+28                                                            
+27                                                            
+26                                                            
+25                                                            
+24                                                            
+23                                                            
+22                                                            
+21                                                            
+20                                                            
+19                                                            
+18                                                            
+17                                                            
+16                                                            
+15                                                            
+14                                                            
+13                                                            
+12                                                            
+11             = E :                                          
+10                 - #                                        
+ 9                     -                                      
+ 8                       .                                    
+ 7                                                            
+ 6                                                            
+ 5                                                            
+ 4                                                            
+ 3                                                            
+ 2                                                            
+ 1 W                                                          
+ 0                                                            
+   0                   1                   2                  
+   0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9
+
+Step 27: just before strategy change 6 (triangulate -> close_in)
+  entropy 1.89 bits | best guess (7, 11) | confidence 0.73
+
+   0                   1                   2                  
+   0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9
+29                                                            
+28                                                            
+27                                                            
+26                                                            
+25                                                            
+24                                                            
+23                                                            
+22                                                            
+21                                                            
+20                                                            
+19                                                            
+18                                                            
+17                                                            
+16                                                            
+15                                                            
+14                                                            
+13                                                            
+12                                                            
+11             + E :                                          
+10                 = *                                        
+ 9                     -                                      
+ 8                       .                                    
+ 7                                                            
+ 6                                                            
+ 5                                                            
+ 4                                                            
+ 3                                                            
+ 2                                                            
+ 1                                                            
+ 0 W                                                          
+   0                   1                   2                  
+   0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9
+
+Step 32: just before strategy change 7 (close_in -> triangulate)
+  entropy 1.74 bits | best guess (7, 11) | confidence 0.65
+
+   0                   1                   2                  
+   0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9
+29                                                            
+28                                                            
+27                                                            
+26                                                            
+25                                                            
+24                                                            
+23                                                            
+22                                                            
+21                                                            
+20                                                            
+19                                                            
+18                                                            
+17                                                            
+16                                                            
+15                                                            
+14                                                            
+13                                                            
+12                                                            
+11             - E :                                          
+10                 - #                                        
+ 9                     -                                      
+ 8                       .                                    
+ 7                                                            
+ 6                                                            
+ 5                                                            
+ 4                                                            
+ 3                                                            
+ 2                                                            
+ 1     W                                                      
+ 0                                                            
+   0                   1                   2                  
+   0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9
+
+Step 54: just before strategy change 8 (triangulate -> close_in)
+  entropy 1.17 bits | best guess (7, 11) | confidence 0.76
+
+   0                   1                   2                  
+   0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9
+29                                                            
+28                                                            
+27                                                            
+26                                                            
+25                                                            
+24                                                            
+23                                                            
+22                                                            
+21                                                            
+20                                                            
+19                                                            
+18                                                            
+17                                                            
+16                                                            
+15                                                            
+14                                                            
+13                                                            
+12                                                            
+11             - E                                            
+10                   *                                        
+ 9                     :                                      
+ 8                                                            
+ 7                                                            
+ 6                                                            
+ 5                                                            
+ 4                                                            
+ 3                                                            
+ 2                                                            
+ 1 W                                                          
+ 0                                                            
+   0                   1                   2                  
+   0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9
+
+Final (step 80)
+  entropy 0.00 bits | best guess (7, 11) | confidence 1.00
+
+   0                   1                   2                  
+   0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9
+29                                                            
+28                                                            
+27                                                            
+26                                                            
+25                                                            
+24                                                            
+23                                                            
+22                                                            
+21                                                            
+20                                                            
+19                                                            
+18                                                            
+17                                                            
+16                                                            
+15                                                            
+14                                                            
+13                                                            
+12                                                            
+11               E                                            
+10                                                            
+ 9                                                            
+ 8                                                            
+ 7   W                                                        
+ 6                                                            
+ 5                                                            
+ 4                                                            
+ 3                                                            
+ 2                                                            
+ 1                                                            
+ 0                                                            
+   0                   1                   2                  
+   0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9
+
